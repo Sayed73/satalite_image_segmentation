@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satellite Image Water Detection</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Satellite Image Water Detection</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" id="file-input" accept=".tif,.tiff">
+                <label for="file-input" class="file-input-label">Choose File</label>
+            </div>
+            <button type="submit" class="submit-btn">Predict</button>
+        </form>
+        <div id="result">
+            <div class="image-container">
+                <h3>Input Image</h3>
+                <img id="input-image" src="" alt="Input Image">
+            </div>
+            <div class="image-container">
+                <h3>Prediction Mask</h3>
+                <img id="mask-image" src="" alt="Prediction Mask">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Hide the result section initially
+            $('#result').hide();
+
+            $('#upload-form').on('submit', function(e) {
+                e.preventDefault();
+                var formData = new FormData(this);
+                $.ajax({
+                    url: '/',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(data) {
+                        $('#input-image').attr('src', 'data:image/png;base64,' + data.input_image);
+                        $('#mask-image').attr('src', 'data:image/png;base64,' + data.mask);
+                        $('#result').show(); // Show the images only after successful prediction
+                    },
+                    error: function() {
+                        alert('An error occurred while processing the image.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
